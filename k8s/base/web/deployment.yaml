@@ -16,9 +16,6 @@ spec:
           image: web
           ports:
             - containerPort: 3000
-          envFrom:
-            - configMapRef:
-                name: oddlaws-web-config
           env:
             - name: DATABASE_URL
               valueFrom:
