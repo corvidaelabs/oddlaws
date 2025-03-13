@@ -1,6 +1,7 @@
 name: deploy - staging
 
 on:
+  push:
   workflow_dispatch:
   release:
     types:
