@@ -1,11 +1,7 @@
 # yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
-name: build ui
+name: build image
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
   workflow_call:
     outputs:
       image_tag:
