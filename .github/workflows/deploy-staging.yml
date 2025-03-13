@@ -10,6 +10,8 @@ on:
 jobs:
   build:
     uses: ./.github/workflows/build-image.yml
+    with:
+      push: true
     secrets: inherit
 
   deploy:
@@ -38,4 +40,4 @@ jobs:
       - name: Deploy to staging
         run: |
           kubectl apply -k k8s/overlays/staging
-          kubectl rollout status deployment/farmhand-api-staging -n staging --timeout=2m
+          kubectl rollout status deployment/oddlaws-web-staging -n staging --timeout=2m
