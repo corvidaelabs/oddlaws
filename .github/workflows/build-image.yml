@@ -60,7 +60,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and push UI image
+      - name: Build and push web image
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -75,4 +75,4 @@ jobs:
           cache-to: type=gha,mode=max
 
       - name: Image digest
-        run: echo "UI image digest $(doctl registry repository digest-list ${{ vars.WEB_IMAGE }} --format Tag,Digest --no-header | grep ${{ needs.setup.outputs.version }})"
+        run: echo "web image digest $(doctl registry repository digest-list ${{ vars.WEB_IMAGE }} --format Tag,Digest --no-header | grep ${{ needs.setup.outputs.version }})"
