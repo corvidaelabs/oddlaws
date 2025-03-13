@@ -6,7 +6,10 @@
 	let { user } = $props();
 </script>
 
-<AppBar>
+<AppBar classes="justify-center leading-[2]">
+	{#snippet lead()}
+		<a href="/" class="text-left font-semibold uppercase">Oddlaws Experiments</a>
+	{/snippet}
 	{#snippet trail()}
 		{#if user}
 			<div class="user">
@@ -23,5 +26,4 @@
 			</a>
 		{/if}
 	{/snippet}
-	<span>Title</span>
 </AppBar>
