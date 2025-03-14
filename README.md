@@ -37,5 +37,14 @@ docker run --name oddlaws-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=
 
 ## Deployment
 
-Pre-releases currently deploy to the [staging site](https://oddlaws.sneakycrow.dev), but I (sneakycrow) am happy to setup a few other
+Merges into `main` currently deploy to the [staging site](https://oddlaws.sneakycrow.dev), but I (sneakycrow) am happy to setup a few other
 environments for you if you need one.
+
+## Useful Links
+
+- [SvelteKit](https://svelte.dev/docs/kit/introduction)
+- [Skeleton](https://skeleton.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Vite](https://vitejs.dev/)
+- [Lucia](https://lucia-auth.com/)
+- [Drizzle ORM](https://orm.drizzle.team/)
