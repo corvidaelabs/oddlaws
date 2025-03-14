@@ -37,5 +37,5 @@ docker run --name oddlaws-postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=
 
 ## Deployment
 
-Pre-releases currently deploy to the [staging site](https://oddlaws.sneakycrow.dev), but I (sneakycrow) am happy to setup a few other
+Merges into `main` currently deploy to the [staging site](https://oddlaws.sneakycrow.dev), but I (sneakycrow) am happy to setup a few other
 environments for you if you need one.
