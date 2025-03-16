@@ -1,6 +1,14 @@
 import * as auth from '$lib/server/auth';
 import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import type { Actions, PageServerLoad } from './$types';
+import { getPublishedMembers } from '$lib/server/db/member';
+
+export const load: PageServerLoad = async () => {
+	const publishedMembers = await getPublishedMembers();
+	return {
+		publishedMembers
+	};
+};
 
 export const actions: Actions = {
 	logout: async (event) => {
