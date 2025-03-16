@@ -5,10 +5,37 @@ use serenity::model::gateway::{Presence, Ready};
 use serenity::model::guild::{Member, Role};
 use serenity::model::id::RoleId;
 use serenity::prelude::*;
+use std::collections::HashSet;
 use std::env;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
-struct Handler;
+/// Default handler for the Discord bot
+struct Handler {
+    pub enabled_guilds: HashSet<GuildId>,
+}
+
+impl Handler {
+    fn from_env() -> Self {
+        let guild_ids = env::var("ALLOWED_GUILD_IDS")
+            .map(|ids| {
+                ids.split(',')
+                    .map(|id| {
+                        GuildId::new(id.trim().parse::<u64>().expect("Guild ID must be a number"))
+                    })
+                    .collect::<HashSet<_>>()
+            })
+            .unwrap_or_default();
+
+        Self {
+            enabled_guilds: guild_ids,
+        }
+    }
+}
+impl Default for Handler {
+    fn default() -> Self {
+        Self::from_env()
+    }
+}
 
 #[async_trait]
 impl EventHandler for Handler {
@@ -23,8 +50,30 @@ impl EventHandler for Handler {
         tracing::debug!("Presence Update, new date {:?}", new_data);
     }
 
-    async fn ready(&self, _: Context, ready: Ready) {
-        tracing::debug!("{} is connected!", ready.user.name);
+    async fn ready(&self, ctx: Context, ready: Ready) {
+        tracing::info!("Connected as {}", ready.user.name);
+        tracing::info!("Enabled guilds: {:?}", self.enabled_guilds);
+
+        for guild_id in &self.enabled_guilds {
+            tracing::info!("Attempting to fetch guild {}", guild_id);
+
+            // Try to fetch guild members explicitly
+            match guild_id.members(&ctx.http, None, None).await {
+                Ok(members) => {
+                    tracing::info!(
+                        "Successfully fetched {} members from guild {}",
+                        members.len(),
+                        guild_id
+                    );
+                    for member in members {
+                        tracing::debug!("Member: {}", member.user.name);
+                    }
+                }
+                Err(e) => {
+                    tracing::error!("Failed to fetch members for guild {}: {:?}", guild_id, e)
+                }
+            }
+        }
     }
 
     // When a member's roles are updated
@@ -115,9 +164,10 @@ async fn main() {
         | GatewayIntents::GUILD_PRESENCES
         | GatewayIntents::GUILD_MEMBERS
         | GatewayIntents::GUILD_MESSAGE_REACTIONS;
+
     // Build our client.
     let mut client = Client::builder(token, intents)
-        .event_handler(Handler)
+        .event_handler(Handler::default())
         .await
         .expect("Error creating client");
 
