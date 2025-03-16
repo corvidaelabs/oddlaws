@@ -2,7 +2,6 @@
 	let { data } = $props();
 
 	let members = data.publishedMembers ?? [];
-	console.log(members);
 </script>
 
 <section class="flex min-h-full w-full grow flex-col items-center justify-center space-y-4">
@@ -13,10 +12,9 @@
 	<div class="flex gap-2">
 		{#each members as member (member.member.discordId)}
 			<div class="flex flex-col items-center">
-				<h1>Screenshots by {member.member.name}</h1>
-				{#each member.screenshots as screenshot (screenshot.id)}
-					<img src={screenshot.url} alt={screenshot.id} class="max-w-3xs" />
-				{/each}
+				<a href={`/player/${member.member.name}`} class="chip preset-filled-primary-500">
+					{member.member.name}
+				</a>
 			</div>
 		{/each}
 	</div>
