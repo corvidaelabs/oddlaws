@@ -30,6 +30,34 @@ impl Handler {
             enabled_guilds: guild_ids,
         }
     }
+
+    async fn get_members(&self, ctx: Context, with_role_id: u64) -> Vec<Member> {
+        let mut to_publish_members = Vec::new();
+
+        for guild_id in &self.enabled_guilds {
+            tracing::debug!("Attempting to fetch guild {}", guild_id);
+
+            match guild_id.members(&ctx.http, None, None).await {
+                Ok(members) => {
+                    // Filter out only users with target role
+                    let members_with_roles: Vec<_> = members
+                        .into_iter()
+                        .filter(|member| member.roles.iter().any(|role| role.get() == with_role_id))
+                        .collect();
+                    if members_with_roles.len() == 0 {
+                        tracing::warn!("No members with target role found in guild {}", guild_id);
+                        return to_publish_members;
+                    }
+                    to_publish_members.extend(members_with_roles.into_iter());
+                }
+                Err(e) => {
+                    tracing::error!("Failed to fetch members for guild {}: {:?}", guild_id, e)
+                }
+            }
+        }
+
+        to_publish_members
+    }
 }
 impl Default for Handler {
     fn default() -> Self {
@@ -54,26 +82,10 @@ impl EventHandler for Handler {
         tracing::info!("Connected as {}", ready.user.name);
         tracing::info!("Enabled guilds: {:?}", self.enabled_guilds);
 
-        for guild_id in &self.enabled_guilds {
-            tracing::info!("Attempting to fetch guild {}", guild_id);
-
-            // Try to fetch guild members explicitly
-            match guild_id.members(&ctx.http, None, None).await {
-                Ok(members) => {
-                    tracing::info!(
-                        "Successfully fetched {} members from guild {}",
-                        members.len(),
-                        guild_id
-                    );
-                    for member in members {
-                        tracing::debug!("Member: {}", member.user.name);
-                    }
-                }
-                Err(e) => {
-                    tracing::error!("Failed to fetch members for guild {}: {:?}", guild_id, e)
-                }
-            }
-        }
+        // Get members in guild with role
+        const TARGET_ROLE_ID: u64 = 1350675274924294236;
+        let members = self.get_members(ctx, TARGET_ROLE_ID).await;
+        tracing::info!("Members found {:?}", members);
     }
 
     // When a member's roles are updated
