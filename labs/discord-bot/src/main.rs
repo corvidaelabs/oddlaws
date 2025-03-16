@@ -83,7 +83,7 @@ impl EventHandler for Handler {
         tracing::info!("Enabled guilds: {:?}", self.enabled_guilds);
 
         // Get members in guild with role
-        const TARGET_ROLE_ID: u64 = 1350675274924294236;
+        const TARGET_ROLE_ID: u64 = 1350675274924294236; // "Fake Role"
         let members = self.get_members(ctx, TARGET_ROLE_ID).await;
         tracing::info!("Members found {:?}", members);
     }
