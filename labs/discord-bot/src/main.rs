@@ -69,19 +69,11 @@ impl EventHandler for Handler {
     }
 
     async fn reaction_add(&self, _ctx: Context, reaction: Reaction) {
-        tracing::debug!(
-            "Reaction added: {:?} by user {:?}",
-            reaction.emoji,
-            reaction.user_id
-        );
+        tracing::debug!("Reaction added: {:?}", reaction);
     }
 
     async fn reaction_remove(&self, _ctx: Context, reaction: Reaction) {
-        tracing::debug!(
-            "Reaction removed: {:?} by user {:?}",
-            reaction.emoji,
-            reaction.user_id
-        );
+        tracing::debug!("Reaction removed: {:?}", reaction);
     }
 
     async fn reaction_remove_all(
