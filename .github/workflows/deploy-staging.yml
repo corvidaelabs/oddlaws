@@ -38,6 +38,7 @@ jobs:
         run: |
           cd k8s/overlays/staging
           kustomize edit set image web=${{ secrets.DO_REGISTRY }}/${{ vars.WEB_IMAGE }}:${{ needs.build.outputs.image_tag }}
+          kustomize edit set image bot=${{ secrets.DO_REGISTRY }}/${{ vars.BOT_IMAGE }}:${{ needs.build.outputs.image_tag }}
 
       - name: Deploy to staging
         run: |
