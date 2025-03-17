@@ -26,7 +26,8 @@ async fn main() {
         | GatewayIntents::MESSAGE_CONTENT
         | GatewayIntents::GUILD_PRESENCES
         | GatewayIntents::GUILD_MEMBERS
-        | GatewayIntents::GUILD_MESSAGE_REACTIONS;
+        | GatewayIntents::GUILD_MESSAGE_REACTIONS
+        | GatewayIntents::GUILD_SCHEDULED_EVENTS;
 
     // Initialize our handler
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
