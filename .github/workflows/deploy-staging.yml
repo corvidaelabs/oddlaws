@@ -44,3 +44,4 @@ jobs:
         run: |
           kubectl apply -k k8s/overlays/staging
           kubectl rollout status deployment/oddlaws-web-staging -n staging --timeout=2m
+          kubectl rollout status deployment/oddlaws-bot-staging -n staging --timeout=2m
