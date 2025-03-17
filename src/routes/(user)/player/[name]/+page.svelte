@@ -1,4 +1,6 @@
 <script lang="ts">
+	import ScreenshotGrid from '$lib/components/ScreenshotGrid.svelte';
+
 	let { data } = $props();
 
 	const sortedScreenshots = data.member.screenshots.sort(
@@ -6,10 +8,9 @@
 	);
 </script>
 
-<section class="grid min-h-full w-full grow grid-rows-2 items-center justify-center space-y-4">
+<section class="flex flex-col items-start justify-evenly space-y-4 p-4">
 	<h1 class="text-8xl font-bold">{data.member.member.name}</h1>
-	<h2 class="text-xl font-bold">Screenshots</h2>
-	{#each sortedScreenshots as screenshot (screenshot.id)}
-		<img src={screenshot.url} alt={screenshot.id} class="max-w-md" />
-	{/each}
+	<div class="grid w-full grid-cols-6">
+		<ScreenshotGrid screenshots={sortedScreenshots} class="col-span-2" />
+	</div>
 </section>
