@@ -1,6 +1,8 @@
 use serenity::all::{Context, GuildId, Member, Message};
-use sqlx::{PgPool, types::time::OffsetDateTime};
+use sqlx::PgPool;
 use std::{collections::HashSet, env};
+
+use crate::db::{published_events, published_members::PublishedMember};
 
 pub struct Handler {
     pub enabled_guilds: HashSet<GuildId>,
@@ -62,7 +64,11 @@ impl Handler {
         url: String,
     ) -> Result<(), sqlx::Error> {
         tracing::debug!("Saving screenshot from user: {}", username);
-        let now = OffsetDateTime::now_utc();
+
+        let Some(member) = PublishedMember::by_discord_id(discord_id, &self.db_pool).await? else {
+            return Err(sqlx::Error::RowNotFound);
+        };
+        let now = chrono::Utc::now();
 
         sqlx::query(
             "INSERT INTO member_screenshots (
@@ -77,7 +83,7 @@ impl Handler {
                     updated_at = EXCLUDED.updated_at",
         )
         .bind(url)
-        .bind(discord_id)
+        .bind(member.id)
         .bind(now)
         .bind(now)
         .execute(&self.db_pool)
@@ -121,7 +127,7 @@ impl Handler {
         name: String,
     ) -> Result<(), sqlx::Error> {
         tracing::debug!("Upserting published member with name: {}", name);
-        let now = OffsetDateTime::now_utc();
+        let now = chrono::Utc::now();
 
         sqlx::query(
             "INSERT INTO published_members (discord_id, name, created_at, updated_at)
@@ -137,6 +143,49 @@ impl Handler {
         .execute(&self.db_pool)
         .await?;
 
+        Ok(())
+    }
+
+    pub async fn save_scheduled_events(
+        &self,
+        ctx: &Context,
+    ) -> Result<(), Box<dyn std::error::Error>> {
+        for guild_id in &self.enabled_guilds {
+            match guild_id.scheduled_events(&ctx.http, true).await {
+                Ok(events) => {
+                    for event in events {
+                        let creator_id = event
+                            .creator_id
+                            .map(|id| id.to_string())
+                            .unwrap_or_else(|| "unknown".to_string());
+
+                        let start_time: chrono::DateTime<chrono::Utc> = *event.start_time;
+                        let end_time: Option<chrono::DateTime<chrono::Utc>> =
+                            event.end_time.map(|t| *t);
+
+                        if let Err(e) = published_events::ScheduledEvent::upsert(
+                            event.id.to_string(),
+                            event.name,
+                            event.description,
+                            start_time,
+                            end_time,
+                            &self.db_pool,
+                        )
+                        .await
+                        {
+                            tracing::error!("Failed to save scheduled event: {:?}", e);
+                        }
+                    }
+                }
+                Err(e) => {
+                    tracing::error!(
+                        "Failed to fetch scheduled events for guild {}: {:?}",
+                        guild_id,
+                        e
+                    );
+                }
+            }
+        }
         Ok(())
     }
 }

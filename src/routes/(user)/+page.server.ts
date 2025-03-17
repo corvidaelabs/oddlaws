@@ -2,11 +2,14 @@ import * as auth from '$lib/server/auth';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
 import { getPublishedMembers } from '$lib/server/db/member';
+import { getAllScheduledEvents } from '$lib/server/db/published-events';
 
 export const load: PageServerLoad = async () => {
 	const publishedMembers = await getPublishedMembers();
+	const scheduledEvents = await getAllScheduledEvents();
 	return {
-		publishedMembers
+		publishedMembers,
+		scheduledEvents
 	};
 };
 

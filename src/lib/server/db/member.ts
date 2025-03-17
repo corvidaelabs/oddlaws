@@ -28,7 +28,7 @@ export const getPublishedMemberByName = async (
 		.from(table.publishedMembers)
 		.leftJoin(
 			table.memberScreenshots,
-			eq(table.publishedMembers.discordId, table.memberScreenshots.memberId)
+			eq(table.publishedMembers.id, table.memberScreenshots.memberId)
 		)
 		.where(eq(table.publishedMembers.name, name));
 
@@ -54,7 +54,7 @@ export const getPublishedMembers = async () => {
 		.from(table.publishedMembers)
 		.leftJoin(
 			table.memberScreenshots,
-			eq(table.publishedMembers.discordId, table.memberScreenshots.memberId)
+			eq(table.publishedMembers.id, table.memberScreenshots.memberId)
 		);
 
 	const grouped = results.reduce<
@@ -63,15 +63,15 @@ export const getPublishedMembers = async () => {
 		const member = row.published_members;
 		const screenshot = row.member_screenshots;
 
-		if (!acc[member.discordId]) {
-			acc[member.discordId] = {
+		if (!acc[member.id]) {
+			acc[member.id] = {
 				member,
 				screenshots: []
 			};
 		}
 
 		if (screenshot) {
-			acc[member.discordId].screenshots.push(screenshot);
+			acc[member.id].screenshots.push(screenshot);
 		}
 
 		return acc;

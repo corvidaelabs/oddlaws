@@ -37,7 +37,7 @@ impl EventHandler for Handler {
         tracing::info!("Enabled guilds: {:?}", self.enabled_guilds);
 
         // Get members in guild with role
-        let members = self.get_members(ctx, TARGET_ROLE_ID).await;
+        let members = self.get_members(ctx.clone(), TARGET_ROLE_ID).await;
         tracing::info!("Members found {:?}", members);
 
         // Upsert members
@@ -45,6 +45,11 @@ impl EventHandler for Handler {
             self.upsert_published_member(member.user.id.to_string(), member.user.name)
                 .await
                 .expect("Failed to upsert member");
+        }
+
+        // Save all scheduled events
+        if let Err(e) = self.save_scheduled_events(&ctx).await {
+            tracing::error!("Failed to save scheduled events: {:?}", e);
         }
     }
 

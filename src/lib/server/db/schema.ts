@@ -17,7 +17,10 @@ export const session = pgTable('session', {
 });
 
 export const publishedMembers = pgTable('published_members', {
-	discordId: text('discord_id').primaryKey(),
+	id: uuid('id')
+		.default(sql`gen_random_uuid()`)
+		.primaryKey(),
+	discordId: text('discord_id').notNull().unique(),
 	name: text('name').notNull(),
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull(),
 	updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' }).notNull()
@@ -28,9 +31,9 @@ export const memberScreenshots = pgTable('member_screenshots', {
 		.default(sql`gen_random_uuid()`)
 		.primaryKey(),
 	url: text('url').notNull(),
-	memberId: text('member_id')
+	memberId: uuid('member_id')
 		.notNull()
-		.references(() => publishedMembers.discordId),
+		.references(() => publishedMembers.id),
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull(),
 	updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' }).notNull()
 });
@@ -41,10 +44,23 @@ export const publishedEvents = pgTable('published_events', {
 		.primaryKey(),
 	title: text('title').notNull(),
 	description: text('description'),
+	discordId: text('discord_id').notNull().unique(),
 	startTime: timestamp('start_time', { withTimezone: true, mode: 'date' }).notNull(),
-	endTime: timestamp('end_time', { withTimezone: true, mode: 'date' }).notNull(),
+	endTime: timestamp('end_time', { withTimezone: true, mode: 'date' }),
 	createdAt: timestamp('created_at', { withTimezone: true, mode: 'date' }).notNull(),
 	updatedAt: timestamp('updated_at', { withTimezone: true, mode: 'date' }).notNull()
+});
+
+export const memberEvents = pgTable('member_events', {
+	id: uuid('id')
+		.default(sql`gen_random_uuid()`)
+		.primaryKey(),
+	member_id: uuid('member_id')
+		.notNull()
+		.references(() => publishedMembers.id),
+	event_id: uuid('event_id')
+		.notNull()
+		.references(() => publishedEvents.id)
 });
 
 export type Session = typeof session.$inferSelect;

@@ -4,6 +4,7 @@ use sqlx::PgPool;
 use std::env;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 
+mod db;
 mod events;
 
 #[tokio::main]
