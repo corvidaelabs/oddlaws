@@ -6,7 +6,6 @@ nameSuffix: -staging
 
 resources:
   - ../../base/web
-  - ../../base/bot
   - ingress.yaml
 
 images:
