@@ -9,6 +9,7 @@
 <AppBar classes="justify-center leading-[2]">
 	{#snippet lead()}
 		<a href="/" class="text-left font-semibold uppercase">Oddlaws Experiments</a>
+		<a href="/skeever" class="text-primary-500 hover:text-primary-300 uppercase">Skeever</a>
 	{/snippet}
 	{#snippet trail()}
 		{#if user}
